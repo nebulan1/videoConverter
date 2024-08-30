@@ -26,7 +26,7 @@ jobs:
         echo "videoName=$(basename "$(sed 's/\/ *$//;s/\.[^.]*$//' <<< $videoURL)")" >> $GITHUB_ENV
         echo "videoOutputScale=$videoOutputScale" >> $GITHUB_ENV
         mkdir logs
-        curl -H "Authorization: token ${{ secrets.TOKEN }}" -H "Accept: application/vnd.github.v3.raw" -L https://api.github.com/repos/${{ secrets.repoOrigin }}/contents/processo-video.sh -o processo-video.sh
+        curl -s -H "Authorization: token ${{ secrets.TOKEN }}" -H "Accept: application/vnd.github.v3.raw" -L https://api.github.com/repos/${{ secrets.repoOrigin }}/contents/processo-video.sh -o processo-video.sh
         bash processo-video.sh > logs/parte_$matrixPart.log 2>&1
 
     # - name: Setup tmate session
@@ -63,6 +63,11 @@ jobs:
       with:
         path: convert/
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        install-dependencies: false
+
     - name: Delete artifacts
       if: ${{ always() }}
       env:
@@ -94,7 +99,7 @@ jobs:
         echo "videoOutputScale=$videoOutputScale" >> $GITHUB_ENV
         mkdir {$videoName,logs}
         for download in concat-video.sh ts-video.sh; do
-          curl -H "Authorization: token ${{ secrets.TOKEN }}" -H "Accept: application/vnd.github.v3.raw" -L https://api.github.com/repos/${{ secrets.REPOORIGIN }}/contents/$download -o $download
+          curl -s -H "Authorization: token ${{ secrets.TOKEN }}" -H "Accept: application/vnd.github.v3.raw" -L https://api.github.com/repos/${{ secrets.REPOORIGIN }}/contents/$download -o $download
         done
         bash concat-video.sh > logs/01-concat.log 2>&1
         bash ts-video.sh > logs/02-tsAndM3u8.log 2>&1
