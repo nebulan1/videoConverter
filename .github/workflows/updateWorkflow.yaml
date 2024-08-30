@@ -14,3 +14,16 @@ jobs:
           jq -r '.[] | select(.type=="file") | .download_url' | while read url; do
               curl -H "Authorization: token ${{ secrets.TOKEN}}" -L $url -O
           done
+      - name: Update github
+        shell: bash
+        run: |
+          git config --local user.email "gitbarnabedikartola@gmail.com"
+          git config --local user.name "gitbarnabedikartola"
+          git add -fv --all
+          if [ -n "$(git commit -m "update $(date +%y-%m-%d_%H:%M)" -a | grep "nothing to commit")" ];then echo "nothing to commit"; exit 0; fi
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          # github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
